@@ -106,7 +106,7 @@ export interface Tournament {
   standings?: TeamStanding[];
 }
 
-export interface TeamStanding {
+interface TeamStanding {
   teamId: string;
   teamName: string;
   position: number;
@@ -132,7 +132,7 @@ export interface UserRole {
   role: 'admin' | 'public';
 }
 
-export interface Notification {
+interface Notification {
   id: string;
   type: 'match_start' | 'match_end' | 'goal' | 'card' | 'tournament_update';
   title: string;
@@ -143,7 +143,7 @@ export interface Notification {
   teamId?: string;
 }
 
-export interface Award {
+interface Award {
   id: string;
   name: string;
   description: string;
