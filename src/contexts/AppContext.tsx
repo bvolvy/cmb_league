@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Tournament, UserRole, Team, Player } from '../types';
+import { Tournament, UserRole, Team, Player, Sponsor } from '../types';
 
 interface AppContextType {
   currentTournament: Tournament | null;
@@ -8,6 +8,8 @@ interface AppContextType {
   setUserRole: (role: UserRole['role']) => void;
   tournaments: Tournament[];
   setTournaments: (tournaments: Tournament[]) => void;
+  globalSponsors: Sponsor[];
+  setGlobalSponsors: (sponsors: Sponsor[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -28,7 +30,8 @@ interface AppProviderProps {
 const STORAGE_KEYS = {
   TOURNAMENTS: 'coupe_mario_brutus_tournaments',
   CURRENT_TOURNAMENT: 'coupe_mario_brutus_current_tournament',
-  USER_ROLE: 'coupe_mario_brutus_user_role'
+  USER_ROLE: 'coupe_mario_brutus_user_role',
+  GLOBAL_SPONSORS: 'coupe_mario_brutus_global_sponsors'
 };
 
 // Fonctions utilitaires pour le localStorage
@@ -81,6 +84,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [currentTournament, setCurrentTournamentState] = useState<Tournament | null>(null);
   const [userRole, setUserRoleState] = useState<UserRole['role']>('public');
   const [tournaments, setTournamentsState] = useState<Tournament[]>([]);
+  const [globalSponsors, setGlobalSponsorsState] = useState<Sponsor[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Charger les données au démarrage
@@ -91,6 +95,81 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         const savedRole = loadFromStorage(STORAGE_KEYS.USER_ROLE);
         if (savedRole) {
           setUserRoleState(savedRole);
+        }
+
+        // Charger les sponsors globaux
+        const savedSponsors = loadFromStorage(STORAGE_KEYS.GLOBAL_SPONSORS);
+        if (savedSponsors) {
+          setGlobalSponsorsState(savedSponsors);
+        } else {
+          // Initialiser avec les sponsors par défaut si aucun n'existe
+          const defaultSponsors: Sponsor[] = [
+            {
+              id: '1',
+              name: 'Heineken',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/09/Heineken-Logo.png',
+              website: 'https://heineken.com',
+              tier: 'official'
+            },
+            {
+              id: '2',
+              name: 'PlayStation',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/09/PlayStation-Logo.png',
+              website: 'https://playstation.com',
+              tier: 'official'
+            },
+            {
+              id: '3',
+              name: 'Lay\'s',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/09/Lays-Logo.png',
+              website: 'https://lays.com',
+              tier: 'official'
+            },
+            {
+              id: '4',
+              name: 'FedEx',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/09/FedEx-Logo.png',
+              website: 'https://fedex.com',
+              tier: 'official'
+            },
+            {
+              id: '5',
+              name: 'Mastercard',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/09/Mastercard-Logo.png',
+              website: 'https://mastercard.com',
+              tier: 'official'
+            },
+            {
+              id: '6',
+              name: 'Crypto.com',
+              logo: 'https://logos-world.net/wp-content/uploads/2021/03/Crypto-com-Logo.png',
+              website: 'https://crypto.com',
+              tier: 'official'
+            },
+            {
+              id: '7',
+              name: 'Bet365',
+              logo: 'https://logos-world.net/wp-content/uploads/2021/03/Bet365-Logo.png',
+              website: 'https://bet365.com',
+              tier: 'official'
+            },
+            {
+              id: '8',
+              name: 'Just Eat',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/11/Just-Eat-Logo.png',
+              website: 'https://justeat.com',
+              tier: 'official'
+            },
+            {
+              id: '9',
+              name: 'Qatar Airways',
+              logo: 'https://logos-world.net/wp-content/uploads/2020/03/Qatar-Airways-Logo.png',
+              website: 'https://qatarairways.com',
+              tier: 'official'
+            }
+          ];
+          setGlobalSponsorsState(defaultSponsors);
+          saveToStorage(STORAGE_KEYS.GLOBAL_SPONSORS, defaultSponsors);
         }
 
         // Charger les tournois
@@ -146,6 +225,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
+  const setGlobalSponsors = (sponsors: Sponsor[]) => {
+    setGlobalSponsorsState(sponsors);
+    saveToStorage(STORAGE_KEYS.GLOBAL_SPONSORS, sponsors);
+  };
+
   // Ne pas rendre le contenu tant que les données ne sont pas chargées
   if (!isLoaded) {
     return (
@@ -167,6 +251,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setUserRole,
         tournaments,
         setTournaments,
+        globalSponsors,
+        setGlobalSponsors,
       }}
     >
       {children}

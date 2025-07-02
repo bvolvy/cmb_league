@@ -8,7 +8,7 @@ interface SponsorManagerProps {
 }
 
 export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
-  const { currentTournament, setCurrentTournament, tournaments, setTournaments } = useApp();
+  const { globalSponsors, setGlobalSponsors } = useApp();
   const [editingSponsor, setEditingSponsor] = useState<Sponsor | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -20,10 +20,6 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
     website: '',
     tier: 'official' as Sponsor['tier']
   });
-
-  if (!currentTournament) return null;
-
-  const sponsors = currentTournament.sponsors || [];
 
   const showSuccessMessage = () => {
     setShowSuccess(true);
@@ -46,7 +42,7 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
     }
 
     // Check for duplicate names (excluding current editing sponsor)
-    const existingSponsor = sponsors.find(s => 
+    const existingSponsor = globalSponsors.find(s => 
       s.name.toLowerCase() === sponsorForm.name.toLowerCase() && 
       s.id !== editingSponsor?.id
     );
@@ -91,14 +87,8 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
       tier: sponsorForm.tier
     };
 
-    const updatedSponsors = [...sponsors, newSponsor];
-    const updatedTournament = {
-      ...currentTournament,
-      sponsors: updatedSponsors
-    };
-
-    setCurrentTournament(updatedTournament);
-    setTournaments(tournaments.map(t => t.id === currentTournament.id ? updatedTournament : t));
+    const updatedSponsors = [...globalSponsors, newSponsor];
+    setGlobalSponsors(updatedSponsors);
     
     resetForm();
     showSuccessMessage();
@@ -127,17 +117,11 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
       tier: sponsorForm.tier
     };
 
-    const updatedSponsors = sponsors.map(s => 
+    const updatedSponsors = globalSponsors.map(s => 
       s.id === editingSponsor.id ? updatedSponsor : s
     );
 
-    const updatedTournament = {
-      ...currentTournament,
-      sponsors: updatedSponsors
-    };
-
-    setCurrentTournament(updatedTournament);
-    setTournaments(tournaments.map(t => t.id === currentTournament.id ? updatedTournament : t));
+    setGlobalSponsors(updatedSponsors);
     
     resetForm();
     showSuccessMessage();
@@ -145,14 +129,8 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
 
   const handleDeleteSponsor = (sponsorId: string) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce sponsor ?')) {
-      const updatedSponsors = sponsors.filter(s => s.id !== sponsorId);
-      const updatedTournament = {
-        ...currentTournament,
-        sponsors: updatedSponsors
-      };
-
-      setCurrentTournament(updatedTournament);
-      setTournaments(tournaments.map(t => t.id === currentTournament.id ? updatedTournament : t));
+      const updatedSponsors = globalSponsors.filter(s => s.id !== sponsorId);
+      setGlobalSponsors(updatedSponsors);
       showSuccessMessage();
     }
   };
@@ -186,7 +164,7 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center">
             <Star className="h-6 w-6 text-yellow-500 mr-2" />
-            Gestion des Sponsors
+            Gestion des Sponsors Globaux
           </h2>
           <button
             onClick={onClose}
@@ -332,12 +310,12 @@ export const SponsorManager: React.FC<SponsorManagerProps> = ({ onClose }) => {
           {/* Sponsors List */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Sponsors Actuels ({sponsors.length})
+              Sponsors du Championnat ({globalSponsors.length})
             </h3>
 
-            {sponsors.length > 0 ? (
+            {globalSponsors.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sponsors.map((sponsor) => (
+                {globalSponsors.map((sponsor) => (
                   <div key={sponsor.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold text-gray-900 truncate">{sponsor.name}</h4>
